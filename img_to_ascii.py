@@ -1,10 +1,8 @@
-import cv2
 import os
-from PIL import Image, ImageDraw, ImageFont
+import cv2
 import sys
-
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QDesktopWidget, QFileDialog, QRadioButton, QLabel, \
-    QVBoxLayout, QComboBox, QLineEdit, QMessageBox, QGroupBox, QGridLayout, QCheckBox, QTextEdit, QDialog
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QDesktopWidget, QFileDialog, \
+    QVBoxLayout, QLineEdit, QMessageBox, QGroupBox, QGridLayout, QTextEdit, QDialog
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
@@ -14,6 +12,14 @@ class MyApp(QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
+
+    def resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
     def initUI(self):
 
@@ -105,6 +111,8 @@ class MyApp(QWidget):
                 return
 
         textBox = QTextEdit('')
+        fontDB = QFontDatabase()
+        fontDB.addApplicationFont(self.resource_path('./font/CascadiaCode.ttf'))
         fontVar = QFont("Cascadia Code", 7)
         textBox.setCurrentFont(fontVar)
         box = QVBoxLayout()
