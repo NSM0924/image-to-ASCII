@@ -78,7 +78,7 @@ class MyApp(QWidget):
             try:
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             except:
-                QMessageBox.critical(self, 'Message', '이미지 파일만 선택해 주세요.',
+                QMessageBox.critical(self, 'Message', '이미지 파일이 아니거나\n이미지 경로에 한글이 들어가 있습니다.\n' + fileName,
                                      QMessageBox.Yes)
                 return
 
