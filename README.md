@@ -9,3 +9,5 @@
 ## Discord
 ![cb8f86a49a7ca2bd](https://user-images.githubusercontent.com/77336125/115114535-e179d400-9fca-11eb-92e3-35060694d06f.png)
 
+### Font
+https://github.com/microsoft/cascadia-code/releases
