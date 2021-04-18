@@ -1,22 +1,36 @@
 import cv2
+import os
 
 CHARS = ' .,-~:;=!*#$@'
-nw = 50
+nw = 110
 
-img = cv2.imread('coro.png')
-img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+cap = cv2.VideoCapture('videoplayback.mp4')
+# img = cv2.imread('coro.png')
 
-h, w = img.shape
-nh = int(h / w * nw)
+# print("\x1b[2J", end='')
+os.system('cls')
 
-img = cv2.resize(img, (nw * 2, nh))
+while cap.isOpened():
+    ret, img = cap.read() #한 프레임씩
+    if not ret:
+        break
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-text=''
-for row in img:
-    for pixel in row:
-        index = int(pixel / 256 * len(CHARS))
-        text += CHARS[index]
-        # print(CHARS[index],end='')
+    h, w = img.shape
+    nh = int(h / w * nw)
+
+    img = cv2.resize(img, (nw * 2, nh))
+
+    text = ''
+    for row in img:
+        char = ''
+        for pixel in row:
+            index = int(pixel / 256 * len(CHARS))
+            char += CHARS[index]
+            # print(CHARS[index], end='')
+
+        text+=char+'\n'
 
     print(text)
-    text=''
+    # print("\x1b[2J", end='')
+    # os.system('cls')

@@ -2,7 +2,7 @@ import os
 import cv2
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QDesktopWidget, QFileDialog, \
-    QVBoxLayout, QLineEdit, QMessageBox, QGroupBox, QGridLayout, QTextEdit, QDialog
+    QVBoxLayout, QLineEdit, QMessageBox, QGroupBox, QGridLayout, QTextEdit, QDialog, QCheckBox
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
@@ -40,8 +40,9 @@ class MyApp(QWidget):
         self.move(qr.topLeft())
 
     def saveInfoGroup(self):
-        global nw, w_num
+        global nw, w_num, checkInvert
         nw = ''
+        checkInvert = False
 
         groupbox = QGroupBox('')
 
@@ -52,13 +53,17 @@ class MyApp(QWidget):
         w_num.setPlaceholderText('가로 크기 (기본 50)')
         w_num.textChanged.connect(self.nwInput)
 
-        btn2 = QPushButton("아스키코드", self)
-        btn2.clicked.connect(self.textGroup)
+        btn2 = QCheckBox('반전', self)
+        btn2.stateChanged.connect(self.invert)
+
+        btn3 = QPushButton("아스키코드", self)
+        btn3.clicked.connect(self.textGroup)
 
         vbox = QVBoxLayout()
         vbox.addWidget(btn1)
         vbox.addWidget(w_num)
         vbox.addWidget(btn2)
+        vbox.addWidget(btn3)
         groupbox.setLayout(vbox)
 
         return groupbox
@@ -81,6 +86,13 @@ class MyApp(QWidget):
                 QMessageBox.critical(self, 'Message', '이미지 파일이 아니거나\n이미지 경로에 한글이 들어가 있습니다.\n' + fileName,
                                      QMessageBox.Yes)
                 return
+
+    def invert(self, state):
+        global checkInvert
+        if state == Qt.Checked:
+            checkInvert = True
+        else:
+            checkInvert = False
 
     def textGroup(self):
 
@@ -120,7 +132,10 @@ class MyApp(QWidget):
 
         result = ''
 
-        CHARS = ' .,-~:;=!*#$@'
+        if checkInvert:
+            CHARS = '@$#*!=;:~-,. '
+        else:
+            CHARS = ' .,-~:;=!*#$@'
 
         for row in reImg:
             text = ''
