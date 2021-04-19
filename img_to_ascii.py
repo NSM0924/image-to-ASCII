@@ -2,9 +2,10 @@ import os
 import cv2
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QDesktopWidget, QFileDialog, \
-    QVBoxLayout, QLineEdit, QMessageBox, QGroupBox, QGridLayout, QTextEdit, QDialog, QCheckBox
+    QVBoxLayout, QLineEdit, QMessageBox, QGroupBox, QGridLayout, QTextEdit, QDialog, QCheckBox, QAction
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from tkinter import messagebox
 
 
 class MyApp(QWidget):
@@ -40,9 +41,10 @@ class MyApp(QWidget):
         self.move(qr.topLeft())
 
     def saveInfoGroup(self):
-        global nw, w_num, checkInvert
+        global nw, w_num, checkInvert, saveCheckInvert
         nw = ''
         checkInvert = False
+        saveCheckInvert = False
 
         groupbox = QGroupBox('')
 
@@ -56,13 +58,17 @@ class MyApp(QWidget):
         btn2 = QCheckBox('반전', self)
         btn2.stateChanged.connect(self.invert)
 
-        btn3 = QPushButton("아스키코드", self)
+        saveBtn = QCheckBox('메모장으로 저장', self)
+        saveBtn.stateChanged.connect(self.saveInvert)
+
+        btn3 = QPushButton("아스키코드 변환", self)
         btn3.clicked.connect(self.textGroup)
 
         vbox = QVBoxLayout()
         vbox.addWidget(btn1)
         vbox.addWidget(w_num)
         vbox.addWidget(btn2)
+        vbox.addWidget(saveBtn)
         vbox.addWidget(btn3)
         groupbox.setLayout(vbox)
 
@@ -73,17 +79,17 @@ class MyApp(QWidget):
         nw = text
 
     def openFileNameDialog(self):
-        global img
+        global img, fileName
 
-        fileName, _ = QFileDialog.getOpenFileName(self, "적용할 이미지를 선택하세요.", "",
-                                                  "All Files (*)")
+        filePath, _ = QFileDialog.getOpenFileName(self, "적용할 이미지를 선택하세요.", "")
+        fileName = QFileInfo(filePath).fileName()
 
-        if fileName:
-            img = cv2.imread(fileName)
+        if filePath:
+            img = cv2.imread(filePath)
             try:
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             except:
-                QMessageBox.critical(self, 'Message', '이미지 파일이 아니거나\n이미지 경로에 한글이 들어가 있습니다.\n' + fileName,
+                QMessageBox.critical(self, 'Message', '이미지 파일이 아니거나\n이미지 경로에 한글이 들어가 있습니다.\n' + filePath,
                                      QMessageBox.Yes)
                 return
 
@@ -94,7 +100,15 @@ class MyApp(QWidget):
         else:
             checkInvert = False
 
+    def saveInvert(self, state):
+        global saveCheckInvert
+        if state == Qt.Checked:
+            saveCheckInvert = True
+        else:
+            saveCheckInvert = False
+
     def textGroup(self):
+        global result
 
         self.dialog = QDialog()
         self.dialog.setWindowTitle('결과')
@@ -147,8 +161,32 @@ class MyApp(QWidget):
         print(result)
         textBox.append(result)
 
+        if saveCheckInvert:
+            saveFileName = fileName + "_ASCII.txt"
+
+            File = open(saveFileName, "w")
+            print(result, file=File)
+
+            QMessageBox.information(self, 'Message', '파일 저장 완료\n' + saveFileName,
+                                    QMessageBox.Yes)
+
+
         self.dialog.setLayout(box)
         self.dialog.show()
+
+    def saveTxt(self):
+        try:
+            saveFileName = fileName+"_ASCII.txt"
+        except:
+            QMessageBox.critical(self, 'Message', '이미지 파일을 선택해 주세요.',
+                                 QMessageBox.Yes)
+            return
+
+        File = open(saveFileName, "w")
+        print(result, file=File)
+
+        QMessageBox.information(self, 'Message', '파일 저장 완료\n'+saveFileName,
+                             QMessageBox.Yes)
 
 
 if __name__ == '__main__':
